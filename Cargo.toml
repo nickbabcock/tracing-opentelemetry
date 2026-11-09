@@ -49,14 +49,10 @@ opentelemetry_sdk = { version = "0.33.0", default-features = false, features = [
     "testing",
 ] }
 opentelemetry-stdout = { version = "0.33.0", features = ["trace", "metrics"] }
-opentelemetry-otlp = { version = "0.33.0", features = [
-    "metrics",
-    "grpc-tonic",
-] }
 opentelemetry-semantic-conventions = { version = "0.33.0", features = [
     "semconv_experimental",
 ] }
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1", features = ["macros", "rt"] }
 tracing = { version = "0.1.35", default-features = false, features = [
     "std",
     "attributes",
@@ -68,7 +64,20 @@ tracing-subscriber = { version = "0.3.0", default-features = false, features = [
     "fmt",
 ] }
 
-[target.'cfg(not(target_os = "windows"))'.dev-dependencies]
+# Networking and multi-threaded runtimes do not build for WebAssembly.
+[target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
+opentelemetry-otlp = { version = "0.33.0", features = [
+    "metrics",
+    "grpc-tonic",
+] }
+tokio = { version = "1", features = ["full"] }
+
+# getrandom (through rand) needs its browser backend on wasm32-unknown-unknown;
+# .cargo/config.toml sets the matching cfg.
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dev-dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"] }
+
+[target.'cfg(not(any(target_os = "windows", target_family = "wasm")))'.dev-dependencies]
 pprof = { version = "0.15.0", features = ["flamegraph", "criterion"] }
 
 [target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dependencies]

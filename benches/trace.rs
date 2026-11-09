@@ -4,7 +4,7 @@ use opentelemetry::{
     Context,
 };
 use opentelemetry_sdk::trace::{SdkTracerProvider, Tracer};
-#[cfg(not(target_os = "windows"))]
+#[cfg(not(any(target_os = "windows", target_family = "wasm")))]
 use pprof::criterion::{Output, PProfProfiler};
 use std::time::SystemTime;
 use tracing::{trace, trace_span};
@@ -304,13 +304,13 @@ fn events_harness() {
     dummy();
 }
 
-#[cfg(not(target_os = "windows"))]
+#[cfg(not(any(target_os = "windows", target_family = "wasm")))]
 criterion_group! {
     name = benches;
     config = Criterion::default().with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)));
     targets = many_enters, many_children, many_events
 }
-#[cfg(target_os = "windows")]
+#[cfg(any(target_os = "windows", target_family = "wasm"))]
 criterion_group! {
     name = benches;
     config = Criterion::default();

@@ -1,3 +1,6 @@
+// Needs a multi-threaded Tokio runtime, which WebAssembly does not provide.
+#![cfg(not(target_family = "wasm"))]
+
 use opentelemetry::{global as otel_global, trace::TracerProvider as _};
 use opentelemetry_sdk::{
     error::OTelSdkResult,

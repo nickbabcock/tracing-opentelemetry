@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-#[cfg(not(target_os = "windows"))]
+#[cfg(not(any(target_os = "windows", target_family = "wasm")))]
 use pprof::criterion::{Output, PProfProfiler};
 use tracing_opentelemetry::MetricsLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -181,13 +181,13 @@ fn metrics_events(c: &mut Criterion) {
     group.finish();
 }
 
-#[cfg(not(target_os = "windows"))]
+#[cfg(not(any(target_os = "windows", target_family = "wasm")))]
 criterion_group! {
     name = benches;
     config = Criterion::default().with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)));
     targets = metrics_events
 }
-#[cfg(target_os = "windows")]
+#[cfg(any(target_os = "windows", target_family = "wasm"))]
 criterion_group! {
     name = benches;
     config = Criterion::default();

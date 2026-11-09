@@ -1,0 +1,4 @@
+# getrandom (pulled in through rand by the test dependencies) has no default
+# backend on wasm32-unknown-unknown; use the browser one.
+[target.wasm32-unknown-unknown]
+rustflags = ["--cfg", 'getrandom_backend="wasm_js"']
